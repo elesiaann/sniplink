@@ -1,6 +1,6 @@
 // Main API handler for Sniplink
 const express = require('express');
-const { nanoid } = require('nanoid');
+const crypto = require('crypto');
 const app = express();
 
 // Middleware
@@ -12,7 +12,7 @@ const analytics = new Map();
 
 // Generate a short slug
 function generateSlug() {
-  return nanoid(8); // 8-character slug
+  return crypto.randomBytes(6).toString('base64url').slice(0, 8);
 }
 
 // Health check endpoint

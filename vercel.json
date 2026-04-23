@@ -66,11 +66,5 @@
   "buildCommand": "npm install",
   "outputDirectory": "public",
   "framework": null,
-  "regions": ["iad1"],
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 10,
-      "memory": 1024
-    }
-  }
+  "regions": ["iad1"]
 }

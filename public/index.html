@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 Sniplink - Minimalist URL Shortener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f8fafc;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.2s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            padding: 40px 0 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .tagline {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 40px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        /* Shortener Card */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+            background: white;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        
+        .input-with-icon input {
+            padding-left: 46px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Result */
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: var(--secondary);
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+        
+        .short-url {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .short-url input {
+            flex: 1;
+            background: white;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        /* Analytics Card */
+        .analytics-card {
+            height: 100%;
+        }
+        
+        .analytics-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        
+        .analytics-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--border);
+        }
+        
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 60px 0;
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+        
+        .feature-desc {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.show {
+            display: flex;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">🔗 Sniplink</h1>
+            <p class="tagline">Minimalist URL shortener with beautiful analytics</p>
+        </header>
+        
+        <div class="main-content">
+            <!-- Shortener Card -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-link"></i> Shorten URL</h2>
+                
+                <form id="shortenForm">
+                    <div class="form-group">
+                        <label for="url">Long URL</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-globe"></i>
+                            <input type="url" id="url" placeholder="https://example.com/very-long-url" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customSlug">Custom Slug (Optional)</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-pen"></i>
+                            <input type="text" id="customSlug" placeholder="my-custom-link">
+                        </div>
+                        <small style="color: var(--text-light); font-size: 0.85rem; display: block; margin-top: 5px;">
+                            Leave empty for auto-generated slug
+                        </small>
+                    </div>
+                    
+                    <button type="submit" class="btn">
+                        <i class="fas fa-magic"></i> Create Short Link
+                    </button>
+                </form>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Creating your short link...</p>
+                </div>
+                
+                <div class="result" id="result">
+                    <h3 class="result-title"><i class="fas fa-check-circle"></i> Link Created!</h3>
+                    
+                    <div class="short-url">
+                        <input type="text" id="shortUrl" readonly>
+                        <button class="copy-btn" onclick="copyToClipboard()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-value" id="clickCount">0</div>
+                            <div class="stat-label">Total Clicks</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="qrCode">QR</div>
+                            <div class="stat-label">QR Code</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <a href="#" id="analyticsLink" style="color: var(--primary); text-decoration: none; font-weight: 500;">
+                            <i class="fas fa-chart-line"></i> View Detailed Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analytics Card -->
+            <div class="card analytics-card">
+                <h2 class="card-title"><i class="fas fa-chart-bar"></i> Analytics Preview</h2>
+                
+                <div class="analytics-placeholder" id="analyticsPlaceholder">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>No Analytics Yet</h3>
+                    <p>Create your first short link to see analytics here</p>
+                </div>
+                
+                <div id="analyticsContent" style="display: none;">
+                    <!-- Analytics will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <h3 class="feature-title">Lightning Fast</h3>
+                <p class="feature-desc">Redirects in under 50ms. No waiting, just speed.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Detailed Analytics</h3>
+                <p class="feature-desc">Track clicks, locations, devices, and referrers.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3 class="feature-title">Beautiful Design</h3>
+                <p class="feature-desc">Minimalist interface that's a joy to use.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Secure & Private</h3>
+                <p class="feature-desc">HTTPS only. No tracking cookies. GDPR compliant.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="footer-links">
+                <a href="https://github.com/elesiaann/sniplink" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+                <a href="#" id="apiDocs">
+                    <i class="fas fa-code"></i> API Docs
+                </a>
+                <a href="#" id="privacy">
+                    <i class="fas fa-lock"></i> Privacy
+                </a>
+                <a href="mailto:hello@sniplink.app">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+            </div>
+            <p>© 2026 Sniplink. A beautiful URL shortener by Feng Wom.</p>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: var(--text-light);">
+                Deployed on Vercel • Open Source • MIT License
+            </p>
+        </footer>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Copied to clipboard!</span>
+    </div>
+    
+    <script>
+        // Base URL for API
+        const API_BASE = window.location.origin;
+        
+        // DOM Elements
+        const shortenForm = document.getElementById('shortenForm');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const shortUrlInput = document.getElementById('shortUrl');
+        const analyticsLink = document.getElementById('analyticsLink');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Copy to clipboard
+        function copyToClipboard() {
+            shortUrlInput.select();
+            shortUrlInput.setSelectionRange(0, 99999);
+            
+            try {
+                navigator.clipboard.writeText(shortUrlInput.value);
+                showToast('Copied to clipboard!');
+            } catch (err) {
+                // Fallback for older browsers
+                document.execCommand('copy');
+                showToast('Copied to clipboard!');
+            }
+        }
+        
+        // Generate QR code URL
+        function generateQRCodeUrl(url) {
+            return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+        }
+        
+        // Handle form submission
+        shortenForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const url = document.getElementById('url').value;
+            const customSlug = document.getElementById('customSlug').value;
+            
+            // Show loading, hide result
+            loading.classList.add('show');
+            result.classList.remove('show');
+            
+            try {
+                // Call API to shorten URL
+                const response = await fetch(`${API_BASE}/api/shorten`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: url,
+                        customSlug: customSlug || undefined
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update UI with result
+                    const shortUrl = `${API_BASE}/${data.slug}`;
+                    shortUrlInput.value = shortUrl;
+                    
+                    // Update analytics link
+                    analyticsLink.href = `${API_BASE}/analytics/${data.slug}`;
+                    
+                    // Update stats
+                    document.getElementById('clickCount').textContent = '0';
+                    
+                    // Generate QR code preview
+                    const qrCodeUrl = generateQRCodeUrl(shortUrl);
+                    document.getElementById('qrCode').innerHTML = 
+                        `<img src="${qrCodeUrl}" alt="QR Code" style="width: 40px; height: 40px;">`;
+                    
+                    // Show result
+                    loading.classList.remove('show');
+                    result.classList.add('show');
+                    
+                    // Scroll to result
+                    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    
+                    // Show success toast
+                    showToast('Short link created successfully!');
+                    
+                    // Load analytics preview
+                    loadAnalyticsPreview(data.slug);
+                } else {
+                    throw new Error(data.error || 'Failed to create short link');
+                }
+            } catch (error) {
+                loading.classList.remove('show');
+                showToast(error.message, 'error');
+                console.error('Error:', error);
+            }
+        });
+        
+        // Load analytics preview
+        async function loadAnalyticsPreview(slug) {
+            try {
+                const response = await fetch(`${API_BASE}/api/analytics/${slug}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Hide placeholder, show analytics
+                    document.getElementById('analyticsPlaceholder').style.display = 'none';
+                    const analyticsContent = document.getElementById('analyticsContent');
+                    analyticsContent.style.display = 'block';
+                    
+                    // Update analytics content
+                    analyticsContent.innerHTML = `
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--text);">Quick Stats</h3>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                                <div style="text-align: center; padding: 15px; background: var(--secondary); border-radius: 8px;">
+                                    <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">${data.totalClicks || 0}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-light);">Total Clicks</div>
+                                </div>
+                                <div style="text-align: center; padding: 15px; background: var(--secondary); border-radius: 8px;">
+                                    <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">${data.uniqueVisitors || 0}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-light);">Unique Visitors</div>
+                                </div>
+                                <div style="text-align: center; padding: 15px; background: var(--secondary); border-radius: 8px;">
+                                    <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">${data.topCountry || 'N/A'}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-light);">Top Country</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--text);">Recent Activity</h3>
+                            <div style="background: var(--secondary); border-radius: 8px; padding: 20px;">
+                                <p style="color: var(--text-light); text-align: center; padding: 20px;">
+                                    <i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                                    Detailed analytics available on the analytics page
+                                </p>
+                                <a href="${API_BASE}/analytics/${slug}" style="display: block; text-align: center; color: var(--primary); text-decoration: none; font-weight: 500;">
+                                    <i class="fas fa-external-link-alt"></i> View Full Analytics
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if there's a slug in URL for demo
+            const urlParams = new URLSearchParams(window.location.search);
+            const demoSlug = urlParams.get('demo');
+            
+            if (demoSlug) {
+                loadAnalyticsPreview(demoSlug);
+            }
+            
+            // API Docs link
+            document.getElementById('apiDocs').addEventListener('click', (e) => {
+                e.preventDefault();
+                showToast('API documentation coming soon!');
+            });
+            
+            // Privacy link
+            document.getElementById('privacy').addEventListener('click', (e) => {
+                e.preventDefault();
+                showToast('Privacy policy coming soon!');
+            });
+        });
+    </script>
+</body>
+</html>
